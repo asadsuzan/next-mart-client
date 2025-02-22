@@ -20,14 +20,16 @@ import { FaFacebookF, FaLinkedin } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import registerSchema from "./registerValidation";
-
+import { registerUser } from "@/services/authService/register";
+import { toast } from "sonner";
+import { LoaderCircle } from "lucide-react";
 const RegisterForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("1"); // Starts with '1'
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      firstName: "",
+      name: "",
       lastName: "",
       email: "",
       phone: "1", // Ensures phone starts correctly
@@ -35,7 +37,9 @@ const RegisterForm = () => {
       confirmPassword: "",
     },
   });
-
+  const {
+    formState: { isSubmitting },
+  } = form;
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
     if (input.length <= 10) {
@@ -44,11 +48,22 @@ const RegisterForm = () => {
     }
   };
 
-  const handleSubmit = (data: z.infer<typeof registerSchema>) => {
-    console.log("Form Data:", {
-      ...data,
-      phone: `+880${data.phone}`, // Append country code before sending
-    });
+  const handleSubmit = async (data: z.infer<typeof registerSchema>) => {
+    console.log(data);
+    try {
+      const res = await registerUser(data);
+      if (!res.success) {
+        toast.error(res?.message);
+      } else {
+        toast.success(res?.message);
+        form.reset();
+      }
+      // Reset phone number after successful registration
+      setPhoneNumber("1");
+      form.setValue("phone", "1"); // Update form value
+    } catch (error) {
+      toast.error("An error occurred while registering the user");
+    }
   };
 
   return (
@@ -67,7 +82,7 @@ const RegisterForm = () => {
           {/* First Name */}
           <FormField
             control={form.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel className="font-bold">First Name</FormLabel>
@@ -171,8 +186,14 @@ const RegisterForm = () => {
 
         {/* Submit Button */}
         <FormItem>
-          <Button className="w-full mt-5" type="submit">
-            Sign Up
+          <Button className="w-full mt-5" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <LoaderCircle className="animate-spin " />
+              </>
+            ) : (
+              "Sign Up"
+            )}
           </Button>
         </FormItem>
       </form>
