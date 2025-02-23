@@ -21,8 +21,9 @@ import { FaFacebookF, FaLinkedin } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { LoaderCircle } from "lucide-react";
 import loginSchema from "./loginValidation";
-import { LoginUser } from "@/services/authService/login";
+
 import { toast } from "sonner";
+import { LoginUser } from "@/services/authService";
 const LoginForm = () => {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),

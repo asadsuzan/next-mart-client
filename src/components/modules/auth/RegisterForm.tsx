@@ -20,9 +20,10 @@ import { FaFacebookF, FaLinkedin } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { useState } from "react";
 import registerSchema from "./registerValidation";
-import { registerUser } from "@/services/authService/register";
+
 import { toast } from "sonner";
 import { LoaderCircle } from "lucide-react";
+import { registerUser } from "@/services/authService";
 const RegisterForm = () => {
   const [phoneNumber, setPhoneNumber] = useState("1"); // Starts with '1'
 
