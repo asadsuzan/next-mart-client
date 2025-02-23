@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
+import { jwtDecode } from "jwt-decode";
 
 
 // register user action 
@@ -20,7 +21,8 @@ export async function registerUser(data: FieldValues) {
         if (!response.ok) {
             return { success: false, message: result.message || "Registration failed" };
         }
-
+        const cookieStore = await cookies()
+        cookieStore.set("accessToken", result?.data?.accessToken, { path: "/" });
         return { success: true, message: "Registration successful!", data: result };
     } catch (error) {
         console.error("Register API Error:", error);
@@ -53,5 +55,23 @@ export async function LoginUser(data: FieldValues) {
     } catch (error) {
         console.error("Login API Error:", error);
         return { success: false, message: "Something went wrong!" };
+    }
+}
+
+
+// get current user information 
+export const getCurrentUser = async () => {
+    try {
+        const cookieStore = await cookies()
+        const accessToken = cookieStore.get("accessToken")?.value
+
+        if (accessToken) {
+            const decoded = jwtDecode(accessToken)
+            console.log(decoded)
+            return decoded
+        }
+    } catch (error) {
+        console.error("Failed to get user information:", error);
+        return null
     }
 }
