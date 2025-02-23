@@ -21,6 +21,8 @@ import { FaFacebookF, FaLinkedin } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { LoaderCircle } from "lucide-react";
 import loginSchema from "./loginValidation";
+import { LoginUser } from "@/services/authService/login";
+import { toast } from "sonner";
 const LoginForm = () => {
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -34,7 +36,17 @@ const LoginForm = () => {
   } = form;
 
   const handleSubmit = async (data: z.infer<typeof loginSchema>) => {
-    console.log(data);
+    try {
+      const res = await LoginUser(data);
+      if (!res.success) {
+        toast.error(res?.message);
+      } else {
+        toast.success(res?.message);
+        form.reset();
+      }
+    } catch (error) {
+      toast.error("An error occurred while logging in");
+    }
   };
 
   return (
