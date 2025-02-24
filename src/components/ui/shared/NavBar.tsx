@@ -62,7 +62,7 @@ export default function Navbar() {
           )}
           {user && (
             <>
-              <Link href="/login">
+              <Link href="/create-shop">
                 <Button variant="outline" className="rounded-full">
                   Create Shop
                 </Button>
