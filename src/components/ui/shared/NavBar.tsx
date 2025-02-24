@@ -1,14 +1,24 @@
-
-import { Heart, ShoppingBag } from "lucide-react";
+"use client";
+import { Heart, LogOutIcon, ShoppingBag } from "lucide-react";
 import { Button } from "../button";
 import Logo from "@/app/assets/svgs/Logo";
+import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Navbar() {
   return (
     <header className="border-b w-full">
       <div className="container flex justify-between items-center mx-auto h-16 px-3">
         <h1 className="text-2xl font-black flex items-center">
-          <Logo/>
+          <Logo />
           Next Mart
         </h1>
         <div className="max-w-md  flex-grow">
@@ -25,8 +35,37 @@ export default function Navbar() {
           <Button variant="outline" className="rounded-full p-0 size-10">
             <ShoppingBag />
           </Button>
+          <Link href="/login">
+            <Button variant="outline" className="rounded-full">
+              Sign In
+            </Button>
+          </Link>
+          <Link href="/login">
+            <Button variant="outline" className="rounded-full">
+              Create Shop
+            </Button>
+          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>Profile</DropdownMenuItem>
+              <DropdownMenuItem>My Shop</DropdownMenuItem>
+              <DropdownMenuItem>Dashboard</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOutIcon /> <span>Logout</span>{" "}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
       </div>
     </header>
-    );
-  }
+  );
+}
