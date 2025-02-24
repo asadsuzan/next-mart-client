@@ -1,9 +1,12 @@
-import React from 'react'
+"use client";
+import { useUser } from "@/context/UserContext";
+import React from "react";
 
 const DashboardPage = () => {
-  return (
-    <div>DashboardPage</div>
-  )
-}
+  const user = useUser();
+  console.log(user);
 
-export default DashboardPage
+  return <div>DashboardPage</div>;
+};
+
+export default DashboardPage;
