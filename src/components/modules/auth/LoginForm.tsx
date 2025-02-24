@@ -21,10 +21,12 @@ import { FaFacebookF, FaLinkedin } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { LoaderCircle } from "lucide-react";
 import loginSchema from "./loginValidation";
-
+import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
-import { LoginUser } from "@/services/authService";
+import { LoginUser, verifyGoogleReCaptcha } from "@/services/authService";
+import { useState } from "react";
 const LoginForm = () => {
+  const [isReCaptchaVerified, setIsReCaptchaVerified] = useState(false);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -47,6 +49,26 @@ const LoginForm = () => {
       }
     } catch (error) {
       toast.error("An error occurred while logging in");
+    }
+  };
+
+  const handleReCaptcha = async (token: string | null) => {
+    try {
+      if (token) {
+        // Call the reCAPTCHA verification API
+        const res = await verifyGoogleReCaptcha(token);
+        if (res.success) {
+          toast.success(res.message);
+          setIsReCaptchaVerified(true);
+        } else {
+          toast.error("Please verify the reCAPTCHA");
+          setIsReCaptchaVerified(false);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to verify reCAPTCHA:", error);
+      toast.error("An error occurred while verifying reCAPTCHA");
+      setIsReCaptchaVerified(false);
     }
   };
 
@@ -102,10 +124,18 @@ const LoginForm = () => {
             Forgot Password?
           </Link>
         </FormItem>
+        <ReCAPTCHA
+          sitekey={process.env.NEXT_PUBLIC_CLIENT_KEY as string}
+          onChange={handleReCaptcha}
+        />
 
         {/* Submit Button */}
         <FormItem>
-          <Button className="w-full mt-5" type="submit" disabled={isSubmitting}>
+          <Button
+            className="w-full mt-5"
+            type="submit"
+            disabled={isSubmitting || !isReCaptchaVerified}
+          >
             {isSubmitting ? (
               <>
                 <LoaderCircle className="animate-spin " />

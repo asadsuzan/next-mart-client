@@ -75,3 +75,31 @@ export const getCurrentUser = async () => {
         return null
     }
 }
+
+// google recaptcha verification
+
+export const verifyGoogleReCaptcha = async (token: string) => {
+    try {
+        const response = await fetch(`https://www.google.com/recaptcha/api/siteverify`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                secret: process.env.NEXT_PUBLIC_SERVER_KEY!,
+                response: token,
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            return { success: false, message: result.message || "Failed to verify reCAPTCHA" };
+        }
+
+        return { success: true, message: "ReCAPTCHA verification successful!" };
+    } catch (error) {
+        console.error("ReCAPTCHA verification API Error:", error);
+        return { success: false, message: "Something went wrong!" };
+    }
+}
