@@ -4,7 +4,17 @@ import { getCurrentUser } from "@/services/authService";
 import { TUser } from "@/types";
 import { createContext, useContext, useEffect, useState } from "react";
 
-const UserContext = createContext({});
+const UserContext = createContext<{
+  user: TUser | null;
+  loading: boolean;
+  setUser: React.Dispatch<React.SetStateAction<TUser | null>>;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}>({
+  user: null,
+  loading: true,
+  setUser: () => {},
+  setLoading: () => {},
+});
 
 interface TUserProviderProps {
   children: React.ReactNode;
@@ -25,7 +35,7 @@ const UserProvider = ({ children }: TUserProviderProps) => {
 
       setLoading(false);
     })();
-  }, []);
+  }, [loading]);
   return (
     <UserContext.Provider
       value={{
@@ -46,6 +56,6 @@ export const useUser = () => {
     throw new Error("useUser must be used within a UserProvider");
   }
   return context;
-}
+};
 
 export default UserProvider;

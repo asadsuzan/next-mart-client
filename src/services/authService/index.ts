@@ -103,3 +103,16 @@ export const verifyGoogleReCaptcha = async (token: string) => {
         return { success: false, message: "Something went wrong!" };
     }
 }
+
+
+// logout user action
+export const logoutUser = async () => {
+    try {
+        const cookieStore = await cookies()
+        cookieStore.delete("accessToken");
+        return { success: true, message: "Logout successful!" };
+    } catch (error) {
+        console.error("Logout API Error:", error);
+        return { success: false, message: "Something went wrong!" };
+    }
+}
