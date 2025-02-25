@@ -25,7 +25,10 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from "sonner";
 import { LoginUser, verifyGoogleReCaptcha } from "@/services/authService";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 const LoginForm = () => {
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirectPath");
   const [isReCaptchaVerified, setIsReCaptchaVerified] = useState(false);
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -46,6 +49,9 @@ const LoginForm = () => {
       } else {
         toast.success(res?.message);
         form.reset();
+        if (redirectPath) {
+          window.location.href = redirectPath;
+        }
       }
     } catch (error) {
       toast.error("An error occurred while logging in");
