@@ -1,5 +1,5 @@
 "use client";
-import { FieldValues, useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,14 +12,35 @@ import {
 import { Input } from "@/components/ui/input";
 import ImageUploader from "@/components/core/MNImageUpLoader";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ImagePreviewer from "@/components/core/MNImageUpLoader/ImagePreviewer";
+import { crateShop } from "@/services/shopService";
+import { toast } from "sonner";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
+import createShopSchema from "./createShopValidation";
+import { getCountryCode } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const CreateShopForm = () => {
   const [images, setImages] = useState<File[] | []>([]);
   const [previewImages, setPreviewImages] = useState<string[] | []>([]);
+  const [countryCode, setCountryCode] = useState<string>("US"); // Default to US
 
-  const form = useForm({
+  // Detect user's country code on component mount
+  useEffect(() => {
+    const detectCountry = async () => {
+      const code = await getCountryCode();
+      setCountryCode(code);
+    };
+    detectCountry();
+  }, []);
+  const router = useRouter();
+  const form = useForm<z.infer<ReturnType<typeof createShopSchema>>>({
+    resolver: zodResolver(createShopSchema(countryCode)), // Pass countryCode to schema
     defaultValues: {
       shopName: "",
       businessLicenseNumber: "",
@@ -41,8 +62,48 @@ const CreateShopForm = () => {
     formState: { isSubmitting },
   } = form;
 
-  const onSubmit = (data: FieldValues) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const servicesOffered: string[] = data?.servicesOffered
+      ?.trim()
+      ?.split(",")
+      ?.map((item: string) => item?.trim())
+      ?.filter((item: string) => {
+        return item?.trim() !== "";
+      });
+
+    const socialMediaLinks: { [key: string]: string } = {
+      facebook: data?.socialMediaLinks?.facebook.trim(),
+      twitter: data?.socialMediaLinks?.twitter.trim(),
+      instagram: data?.socialMediaLinks?.instagram.trim(),
+    };
+    const establishedYear = Number(data?.establishedYear);
+
+    const shopData = {
+      shopName: data?.shopName,
+      businessLicenseNumber: data?.businessLicenseNumber,
+      address: data?.address,
+      contactNumber: data?.contactNumber,
+      website: data?.website,
+      servicesOffered: servicesOffered || [],
+      establishedYear,
+      socialMediaLinks,
+      taxIdentificationNumber: data?.taxIdentificationNumber,
+    };
+    try {
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(shopData));
+      formData.append("logo", images[0] as File);
+      const res = await crateShop(formData);
+      if (res.success) {
+        toast.success(res?.message);
+        form.reset();
+        router.push("/");
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred while creating the shop");
+    }
   };
 
   return (
@@ -103,7 +164,14 @@ const CreateShopForm = () => {
               <FormItem>
                 <FormLabel className="font-bold">Contact Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter contact number" {...field} />
+                  <PhoneInput
+                    placeholder="Enter contact number"
+                    value={field.value}
+                    onChange={field.onChange}
+                    defaultCountry={countryCode as any}
+                    international
+                    withCountryCallingCode
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,7 +199,7 @@ const CreateShopForm = () => {
               <FormItem>
                 <FormLabel className="font-bold">Facebook</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter facebook URL" {...field} />
+                  <Input placeholder="Enter Facebook URL" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -145,7 +213,7 @@ const CreateShopForm = () => {
               <FormItem>
                 <FormLabel className="font-bold">Instagram</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter instagram URL" {...field} />
+                  <Input placeholder="Enter Instagram URL" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -159,7 +227,7 @@ const CreateShopForm = () => {
               <FormItem>
                 <FormLabel className="font-bold">Twitter</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter twitter URL" {...field} />
+                  <Input placeholder="Enter Twitter URL" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
