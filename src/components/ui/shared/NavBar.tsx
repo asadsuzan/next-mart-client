@@ -18,7 +18,7 @@ import { useUser } from "@/context/UserContext";
 
 export default function Navbar() {
   const { user, setLoading } = useUser();
-  console.log(user);
+
   const handleLogout = async () => {
     try {
       const res = await logoutUser();
@@ -32,6 +32,7 @@ export default function Navbar() {
       toast.error("An error occurred while logging out");
     }
   };
+  console.log(user);
   return (
     <header className="border-b w-full">
       <div className="container flex justify-between items-center mx-auto h-16 px-3">
@@ -60,13 +61,14 @@ export default function Navbar() {
               </Button>
             </Link>
           )}
+
+          {user && !user?.hasShop && (
+            <Link href="/create-shop">
+              <Button className="rounded-full">Create Shop</Button>
+            </Link>
+          )}
           {user && (
             <>
-              <Link href="/create-shop">
-                <Button variant="outline" className="rounded-full">
-                  Create Shop
-                </Button>
-              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Avatar>
@@ -78,7 +80,9 @@ export default function Navbar() {
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Profile</DropdownMenuItem>
-                  <DropdownMenuItem>My Shop</DropdownMenuItem>
+                  {user?.hasShop && (
+                    <DropdownMenuItem>My Shop</DropdownMenuItem>
+                  )}
                   <DropdownMenuItem>Dashboard</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem

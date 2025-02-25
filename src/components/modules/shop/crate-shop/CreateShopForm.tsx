@@ -24,8 +24,10 @@ import "react-phone-number-input/style.css";
 import createShopSchema from "./createShopValidation";
 import { getCountryCode } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 const CreateShopForm = () => {
+  const { refreshUser } = useUser();
   const [images, setImages] = useState<File[] | []>([]);
   const [previewImages, setPreviewImages] = useState<string[] | []>([]);
   const [countryCode, setCountryCode] = useState<string>("US"); // Default to US
@@ -97,6 +99,7 @@ const CreateShopForm = () => {
       if (res.success) {
         toast.success(res?.message);
         form.reset();
+        await refreshUser();
         router.push("/");
       } else {
         toast.error(res?.message);
