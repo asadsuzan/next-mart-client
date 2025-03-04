@@ -51,6 +51,8 @@ const LoginForm = () => {
         form.reset();
         if (redirectPath) {
           window.location.href = redirectPath;
+        } else {
+          window.location.href = "/profile";
         }
       }
     } catch (error) {
