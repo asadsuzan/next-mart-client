@@ -15,15 +15,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logoutUser } from "@/services/authService";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
+import { usePathname, useRouter } from "next/navigation";
+import { protectedRoute } from "@/constant";
 
 export default function Navbar() {
   const { user, setLoading } = useUser();
-
+  const router = useRouter();
+  const pathName = usePathname();
   const handleLogout = async () => {
     try {
       const res = await logoutUser();
       if (res.success) {
         toast.success(res?.message);
+
+        if (protectedRoute.some((route) => pathName.match(route))) {
+          router.push("/");
+        }
       } else {
         toast.error(res?.message);
       }
