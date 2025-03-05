@@ -14,13 +14,19 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { createCategory } from "@/services/shopService/categoryService";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { LoaderCircleIcon } from "lucide-react";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { createCategorySchema } from "./createCategoryValidation";
 
 const CreateCategoryForm = () => {
   const [images, setImages] = useState<File[] | []>([]);
   const [previewImages, setPreviewImages] = useState<string[] | []>([]);
   const form = useForm({
+    resolver: zodResolver(createCategorySchema),
     defaultValues: {
       name: "",
       description: "",
@@ -30,7 +36,25 @@ const CreateCategoryForm = () => {
     formState: { isSubmitting },
   } = form;
 
-  const handleSubmit = async () => {};
+  const handleSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(data));
+      formData.append("icon", images[0] as File);
+      const res = await createCategory(formData);
+      if (res.success) {
+        toast.success(res?.message);
+        form.reset();
+        setImages([]);
+        setPreviewImages([]);
+        setImages([]);
+      } else {
+        toast.error(res?.message);
+      }
+    } catch (error) {
+      toast.error("An error occurred while creating the product category");
+    }
+  };
 
   return (
     <Form {...form}>
@@ -84,16 +108,18 @@ const CreateCategoryForm = () => {
               setPreviewImages={setPreviewImages}
             />
           )}
-
-          
         </FormItem>
 
         {/* Submit Button */}
+
         <FormItem>
-          <Button className="w-full mt-5" type="submit">
-            Create Category
-            {isSubmitting && (
-              <span className="ml-2 text-gray-500">Loading...</span>
+          <Button className="w-full mt-5" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <LoaderCircleIcon className="animate-spin " />
+              </>
+            ) : (
+              "Create Category"
             )}
           </Button>
         </FormItem>
