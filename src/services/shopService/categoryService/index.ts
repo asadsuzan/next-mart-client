@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 
 
@@ -17,6 +18,8 @@ export async function createCategory(data: FormData) {
         });
 
         const result = await response.json();
+        revalidateTag('CATEGORY')
+
 
         if (!response.ok) {
             console.log(result)
@@ -33,9 +36,14 @@ export async function createCategory(data: FormData) {
 
 export async function getAllCategories() {
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/category`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/category`, {
+            next: {
+                tags: ['CATEGORY']
+            }
+        });
 
         const result = await response.json();
+
 
         if (!response.ok) {
             console.log(result)
@@ -61,6 +69,8 @@ export async function deleteCategory(categoryId: string) {
         });
 
         const result = await response.json();
+
+        revalidateTag('CATEGORY')
 
         if (!response.ok) {
             console.log(result)
