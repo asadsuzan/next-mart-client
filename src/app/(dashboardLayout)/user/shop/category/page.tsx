@@ -1,9 +1,14 @@
 import ManageCategory from "@/components/modules/shop/create-category";
+import { getAllCategories } from "@/services/shopService/categoryService";
 
-const CategoryManagementPage = () => {
+
+const CategoryManagementPage = async () => {
+  // Implement your logic here to fetch data and update the component state
+  const { data } = await getAllCategories();
+
   return (
     <div>
-      <ManageCategory />
+      <ManageCategory categories={data?.data} />
     </div>
   );
 };

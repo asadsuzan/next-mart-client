@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 
 
 
-// create shop action 
+// create category action 
 export async function createCategory(data: FormData) {
     try {
         const cookieStore = await cookies()
@@ -25,6 +25,25 @@ export async function createCategory(data: FormData) {
         return { success: true, message: "Category created successfully!", data: result };
     } catch (error) {
         console.error("Category created API Error:", error);
+        return { success: false, message: "Something went wrong!" };
+    }
+}
+
+// get all categories action
+
+export async function getAllCategories() {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/category`);
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.log(result)
+            return { success: false, message: result.message || "Failed to fetch categories" };
+        }
+        return { success: true, message: "Categories fetched successfully!", data: result };
+    } catch (error) {
+        console.error("Failed to fetch categories API Error:", error);
         return { success: false, message: "Something went wrong!" };
     }
 }

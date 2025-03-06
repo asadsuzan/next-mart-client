@@ -1,12 +1,23 @@
-import { Button } from "@/components/ui/button";
 import React from "react";
 import CreateCategoryModal from "./CreateCategoryModal";
+import { ICategory } from "@/types";
 
-const ManageCategory = () => {
+interface TManageCategoriesProps {
+  categories: ICategory[];
+}
+
+const ManageCategory = ({
+  categories,
+}: {
+  categories: TManageCategoriesProps;
+}) => {
+  console.log(categories);
   return (
-    <div className="flex items-center justify-between">
-      <h1>Manage Category</h1>
-      <CreateCategoryModal />
+    <div>
+      <div className="flex items-center justify-between">
+        <h1>Manage Category</h1>
+        <CreateCategoryModal />
+      </div>
     </div>
   );
 };
