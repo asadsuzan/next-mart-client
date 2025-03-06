@@ -1,6 +1,7 @@
+"use server";
+
 import ManageCategory from "@/components/modules/shop/create-category";
 import { getAllCategories } from "@/services/shopService/categoryService";
-
 
 const CategoryManagementPage = async () => {
   // Implement your logic here to fetch data and update the component state

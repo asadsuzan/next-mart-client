@@ -8,7 +8,7 @@ import { PlusCircleIcon } from "lucide-react";
 const CreateCategoryModal = () => {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="outline" className="flex items-center gap-2">
           <PlusCircleIcon />
           create category
