@@ -6,14 +6,21 @@ import { MNTable } from "@/components/core/MNTable";
 import { ColumnDef } from "@tanstack/react-table";
 import Image from "next/image";
 import { Trash } from "lucide-react";
+import { deleteCategory } from "@/services/shopService/categoryService";
+import { toast } from "sonner";
 
 interface TManageCategoriesProps {
   categories: ICategory[];
 }
 
 const ManageCategory = ({ categories }: TManageCategoriesProps) => {
-  const handleDelete = (data: ICategory) => {
-    console.log(data);
+  const handleDelete = async (categoryId: string) => {
+    const isDeleted = await deleteCategory(categoryId);
+    if (isDeleted.success) {
+      toast.success("Category deleted successfully.");
+    } else {
+      toast.error("Failed to delete category.");
+    }
   };
   const columns: ColumnDef<ICategory>[] = [
     {
@@ -56,7 +63,7 @@ const ManageCategory = ({ categories }: TManageCategoriesProps) => {
         <button
           className="text-red-500"
           title="Delete"
-          onClick={() => handleDelete(row.original)}
+          onClick={() => handleDelete(row?.original?._id)}
         >
           <Trash className="w-5 h-5" />
         </button>

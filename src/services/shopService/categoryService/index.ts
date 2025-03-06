@@ -47,3 +47,29 @@ export async function getAllCategories() {
         return { success: false, message: "Something went wrong!" };
     }
 }
+
+// delete category action
+
+export async function deleteCategory(categoryId: string) {
+    try {
+        const cookieStore = await cookies()
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/category/${categoryId}`, {
+            method: "DELETE",
+            headers: {
+                ...(cookieStore.get('accessToken')?.value && { Authorization: cookieStore.get('accessToken')?.value })
+            }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            console.log(result)
+            return { success: false, message: result.message || "Failed to delete category" };
+        }
+        return { success: true, message: "Category deleted successfully!" };
+    } catch (error) {
+        console.error("Failed to delete category API Error:", error);
+        return { success: false, message: "Something went wrong!" };
+    }
+}
+
